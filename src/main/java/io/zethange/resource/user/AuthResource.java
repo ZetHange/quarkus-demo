@@ -1,5 +1,7 @@
 package io.zethange.resource.user;
 
+import io.zethange.configuration.auth.UserContext;
+import io.zethange.entity.User;
 import io.zethange.models.auth.LoginRequest;
 import io.zethange.models.auth.LoginResponse;
 import io.zethange.models.auth.RefreshRequest;
@@ -8,8 +10,9 @@ import io.zethange.service.auth.AuthService;
 import io.zethange.utils.auth.AccessAuth;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import org.eclipse.microprofile.jwt.JsonWebToken;
+import jakarta.ws.rs.core.SecurityContext;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
@@ -21,9 +24,6 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 public class AuthResource {
     @Inject
     AuthService authService;
-
-    @Inject
-    JsonWebToken jwt;
 
     @POST
     @Path("/register")
@@ -50,8 +50,8 @@ public class AuthResource {
     @Path("/me")
     @Operation(summary = "Get Me", description = "Get user information")
     @AccessAuth
-    public String getMe() {
-        System.out.println("aaa");
-        return "asd";
+    public User getMe(@Context SecurityContext context) {
+        UserContext context1 = (UserContext) context;
+        return context1.getUser();
     }
 }

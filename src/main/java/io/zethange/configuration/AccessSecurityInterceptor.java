@@ -1,5 +1,7 @@
 package io.zethange.configuration;
 
+import io.zethange.configuration.auth.UserContext;
+import io.zethange.entity.User;
 import io.zethange.service.user.UserService;
 import io.zethange.utils.auth.AccessAuth;
 import jakarta.annotation.Priority;
@@ -23,14 +25,13 @@ public class AccessSecurityInterceptor implements ContainerRequestFilter {
     @Inject
     UserService userService;
 
-    @Inject
-
-
     public void filter(ContainerRequestContext context) {
         try {
-//            context.setSecurityContext();
-            String[] authHeader = context.getHeaderString("Authorization").split(" ");
-            System.out.println(authHeader);
+            User user = userService.getByUsername("zethange");
+            UserContext newContext = new UserContext();
+            newContext.setUser(user);
+
+            context.setSecurityContext(newContext);
         } catch (Exception e) {
             System.out.println("not auth header");
         }
