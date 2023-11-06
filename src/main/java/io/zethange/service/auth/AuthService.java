@@ -8,63 +8,62 @@ import io.zethange.models.auth.RegisterRequest;
 import io.zethange.service.user.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.NotAuthorizedException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 
 @ApplicationScoped
 public class AuthService {
-//    @Inject
-//    JsonWebToken jwt;
-
     @Inject
     UserService userService;
 
     @ConfigProperty(name = "security.refresh")
-    String refreshKey;
+    String refresh;
 
     @ConfigProperty(name = "security.access")
-    String accessKey;
+    String access;
 
     public LoginResponse login(LoginRequest req) {
-        return null;
-    }
+        User user = userService.getByUsername(req.getUsername());
 
-    public LoginResponse register(RegisterRequest req) {
-        User user = new User();
-        user.setUsername(req.getUsername());
-        user.setEmail(req.getEmail());
-        user.setPassword(req.getPassword());
-        user.setRole("ADMIN");
-        String token = generateAccessToken(user);
+        if (user == null || !Objects.equals(user.getPassword(), req.getPassword())) {
+            throw new NotAuthorizedException("Not authorized");
+        }
+
+        String accessToken = generateAccessToken(user);
+        String refreshToken = generateRefreshToken(user.getUsername());
         return LoginResponse.builder()
-                .type("Bearer")
-                .accessToken("token")
-                .refreshToken("token")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
-    private String generateAccessToken(User user) {
-        System.out.println(user.toString());
-        try {
-            return Jwt
-                    .upn(user.getUsername())
-                    .groups(new HashSet<>(Arrays.asList(user.getRole())))
-//                    .claim("id", user.id)
-                    .claim("username", user.getUsername())
-                    .claim("email", user.getEmail())
-                    .claim("role", user.getRole())
-                    .signWithSecret(accessKey);
-        } catch (NullPointerException e) {
-            System.out.println(e);
-        }
+    public LoginResponse register(RegisterRequest req) {
+        return null;
+    }
 
-        return "";
+    private String generateAccessToken(User user) {
+        return Jwt
+            .issuer("backend")
+           .upn(user.getUsername())
+           .groups(new HashSet<>(Arrays.asList(user.getRole())))
+           .claim("id", user.id)
+           .claim("username", user.getUsername())
+           .claim("email", user.getEmail())
+           .claim("role", user.getRole())
+           .expiresIn(Duration.ofMinutes(30))
+           .signWithSecret(access);
     }
 
     private String generateRefreshToken(String username) {
-    return "";
+        return Jwt
+                .issuer("backend")
+                .upn(username)
+                .expiresIn(Duration.ofDays(3))
+                .signWithSecret(refresh);
     }
 }

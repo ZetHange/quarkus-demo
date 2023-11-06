@@ -7,7 +7,6 @@ import io.zethange.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.NotFoundException;
-import org.mapstruct.Mapper;
 
 import java.util.List;
 
@@ -31,13 +30,10 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-    public UserDto getByUsername(String username) {
+    public User getByUsername(String username) {
         User user = userRepository.find("username", username).firstResult();
-        if(user == null) {
-            throw new NotFoundException("User not found");
-        }
 
-        return userMapper.toDto(user);
+        return user;
     }
 
     public Long getCount() {

@@ -1,14 +1,15 @@
 package io.zethange.resource.user;
 
-import io.zethange.entity.User;
 import io.zethange.models.auth.LoginRequest;
 import io.zethange.models.auth.LoginResponse;
 import io.zethange.models.auth.RefreshRequest;
 import io.zethange.models.auth.RegisterRequest;
 import io.zethange.service.auth.AuthService;
+import io.zethange.utils.auth.AccessAuth;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
@@ -21,6 +22,9 @@ public class AuthResource {
     @Inject
     AuthService authService;
 
+    @Inject
+    JsonWebToken jwt;
+
     @POST
     @Path("/register")
     @Operation(summary = "Register", description = "Register a new user")
@@ -32,7 +36,7 @@ public class AuthResource {
     @Path("/login")
     @Operation(summary = "Login", description = "Authenticate user and generate access/refresh token")
     public LoginResponse login(@RequestBody LoginRequest req) {
-        return null;
+        return authService.login(req);
     }
 
     @POST
@@ -45,7 +49,9 @@ public class AuthResource {
     @GET
     @Path("/me")
     @Operation(summary = "Get Me", description = "Get user information")
-    public User getMe() {
-        return null;
+    @AccessAuth
+    public String getMe() {
+        System.out.println("aaa");
+        return "asd";
     }
 }
