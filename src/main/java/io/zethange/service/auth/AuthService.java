@@ -41,6 +41,12 @@ public class AuthService {
         return null;
     }
 
+    /**
+     * Refreshes the access token using the provided refresh token.
+     *
+     * @param req The refresh request containing the refresh token.
+     * @return The login response containing the new access and refresh tokens.
+     */
     public LoginResponse refresh(RefreshRequest req) {
         String username = token.parseRefreshToken(req.getRefreshToken());
         User user = userService.getByUsername(username);
@@ -48,6 +54,13 @@ public class AuthService {
         return buildLoginResponse(user);
     }
 
+    /**
+     * Builds a LoginResponse object using the provided User object.
+     * The LoginResponse object contains the access and refresh tokens.
+     *
+     * @param user The User object for which the LoginResponse will be generated.
+     * @return The LoginResponse object.
+     */
     private LoginResponse buildLoginResponse(User user) {
         String accessToken = token.generateAccessToken(user);
         String refreshToken = token.generateRefreshToken(user.getUsername());

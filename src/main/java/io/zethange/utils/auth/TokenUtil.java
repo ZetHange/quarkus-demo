@@ -44,6 +44,7 @@ public class TokenUtil {
         return JWT.create()
                 .withIssuer("refresh")
                 .withClaim("username", username)
+                .withExpiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
                 .sign(algorithmRefresh);
     }
 
