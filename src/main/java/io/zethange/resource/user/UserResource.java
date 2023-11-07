@@ -2,10 +2,12 @@ package io.zethange.resource.user;
 
 import io.zethange.models.user.UserDto;
 import io.zethange.service.user.UserService;
+import io.zethange.utils.auth.AccessAuth;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import java.util.List;
@@ -20,6 +22,8 @@ public class UserResource {
 
     @GET
     @Operation(summary = "Get all users")
+    @AccessAuth(roles = {"ADMIN"})
+    @SecurityRequirement(name="JWT")
     public List<UserDto> getAllUsers() {
         return userService.getAll();
     }

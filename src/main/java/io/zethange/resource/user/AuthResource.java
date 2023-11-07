@@ -15,6 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 @Path("/api/v1/auth")
@@ -43,13 +44,14 @@ public class AuthResource {
     @Path("/refresh")
     @Operation(summary = "Refresh", description = "Get access token using refresh token")
     public LoginResponse refresh(@RequestBody RefreshRequest req) {
-        return null;
+        return authService.refresh(req);
     }
 
     @GET
     @Path("/me")
     @Operation(summary = "Get Me", description = "Get user information")
     @AccessAuth
+    @SecurityRequirement(name="JWT")
     public User getMe(@Context SecurityContext context) {
         UserContext context1 = (UserContext) context;
         return context1.getUser();
