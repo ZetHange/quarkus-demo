@@ -1,4 +1,4 @@
-package io.zethange.models.user;
+package io.zethange.model.user;
 
 import lombok.Data;
 

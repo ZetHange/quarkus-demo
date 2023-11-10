@@ -1,4 +1,4 @@
-package io.zethange.models.user;
+package io.zethange.model.user;
 
 import io.zethange.entity.User;
 import org.mapstruct.Mapper;

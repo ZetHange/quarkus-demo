@@ -1,6 +1,6 @@
 package io.zethange.resource.user;
 
-import io.zethange.models.user.UserDto;
+import io.zethange.model.user.UserDto;
 import io.zethange.service.user.UserService;
 import io.zethange.utils.auth.AccessAuth;
 import jakarta.inject.Inject;

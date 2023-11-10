@@ -1,12 +1,13 @@
 package io.zethange.service.user;
 
 import io.zethange.entity.User;
-import io.zethange.models.user.UserDto;
-import io.zethange.models.user.UserMapper;
+import io.zethange.exception.BaseException;
+import io.zethange.model.user.UserDto;
+import io.zethange.model.user.UserMapper;
 import io.zethange.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -25,15 +26,13 @@ public class UserService {
     public UserDto getById(Long id) {
         User user = userRepository.findById(id);
         if(user == null) {
-            throw new NotFoundException("User not found");
+            throw new BaseException(Response.Status.NOT_FOUND.getStatusCode(), "Not found", "User with this id not found");
         }
         return userMapper.toDto(user);
     }
 
     public User getByUsername(String username) {
-        User user = userRepository.find("username", username).firstResult();
-
-        return user;
+        return userRepository.find("username", username).firstResult();
     }
 
     public Long getCount() {

@@ -1,16 +1,19 @@
 package io.zethange.service.auth;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.zethange.configuration.auth.UserContext;
 import io.zethange.entity.User;
-import io.zethange.models.auth.LoginRequest;
-import io.zethange.models.auth.LoginResponse;
-import io.zethange.models.auth.RefreshRequest;
-import io.zethange.models.auth.RegisterRequest;
+import io.zethange.exception.BaseException;
+import io.zethange.model.auth.LoginRequest;
+import io.zethange.model.auth.LoginResponse;
+import io.zethange.model.auth.RefreshRequest;
+import io.zethange.model.auth.RegisterRequest;
+import io.zethange.model.user.UserDto;
+import io.zethange.model.user.UserMapper;
 import io.zethange.service.user.UserService;
 import io.zethange.utils.auth.TokenUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.NotAuthorizedException;
 
 import java.util.Objects;
 
@@ -22,51 +25,37 @@ public class AuthService {
     TokenUtil token;
     @Inject
     UserContext userContext;
+    @Inject
+    UserMapper userMapper;
 
-    /**
-     * Authenticates the user with the provided username and password, and returns a LoginResponse.
-     *
-     * @param req The login request containing the username and password.
-     * @return The login response containing the access and refresh tokens.
-     * @throws NotAuthorizedException If the user is not authorized.
-     */
     public LoginResponse login(LoginRequest req) {
         User user = userService.getByUsername(req.getUsername());
 
         if (user == null || !Objects.equals(user.getPassword(), req.getPassword())) {
-            throw new NotAuthorizedException("Not authorized");
+            throw new BaseException(401, "Authorization error", "The username or password is incorrect");
         }
 
-        return buildLoginResponse(user);
+        return buildLoginResponse(userMapper.toDto(user));
     }
 
     public LoginResponse register(RegisterRequest req) {
-        return null;
+        return LoginResponse.builder().build();
     }
 
-    /**
-     * Refreshes the access token using the provided refresh token.
-     *
-     * @param req The refresh request containing the refresh token.
-     * @return The login response containing the new access and refresh tokens.
-     */
     public LoginResponse refresh(RefreshRequest req) {
-        String username = token.parseRefreshToken(req.getRefreshToken());
-        User user = userService.getByUsername(username);
+        try {
+            Long id = token.parseRefreshToken(req.getRefreshToken());
+            UserDto user = userService.getById(id);
 
-        return buildLoginResponse(user);
+            return buildLoginResponse(user);
+        } catch (JWTVerificationException e) {
+            throw new BaseException(400, "Validation error", "Failed to validate a refresh token");
+        }
     }
 
-    /**
-     * Builds a LoginResponse object using the provided User object.
-     * The LoginResponse object contains the access and refresh tokens.
-     *
-     * @param user The User object for which the LoginResponse will be generated.
-     * @return The LoginResponse object.
-     */
-    private LoginResponse buildLoginResponse(User user) {
+    private LoginResponse buildLoginResponse(UserDto user) {
         String accessToken = token.generateAccessToken(user);
-        String refreshToken = token.generateRefreshToken(user.getUsername());
+        String refreshToken = token.generateRefreshToken(user.getId());
         return LoginResponse.builder()
                 .type("Bearer")
                 .accessToken(accessToken)
@@ -74,7 +63,7 @@ public class AuthService {
                 .build();
     }
 
-    public User getMe() {
-        return userContext.getCurrentUser();
+    public UserDto getMe() {
+        return userMapper.toDto(userContext.getCurrentUser());
     }
 }

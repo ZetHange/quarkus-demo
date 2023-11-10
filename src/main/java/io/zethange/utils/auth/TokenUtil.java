@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.zethange.entity.User;
+import io.zethange.model.user.UserDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -23,38 +24,24 @@ public class TokenUtil {
     @ConfigProperty(name = "security.access")
     String access;
 
-    /**
-     * Generates an access token for the given user.
-     *
-     * @param user The user for which the access token will be generated.
-     * @return The generated access token.
-     */
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(UserDto user) {
         Algorithm algorithmAccess = Algorithm.HMAC256(access);
         return JWT.create()
                 .withIssuer("access")
-                .withClaim("id", user.id)
-                .withClaim("username", user.getUsername())
+                .withClaim("id", user.getId())
                 .withExpiresAt(Instant.now().plus(30, ChronoUnit.MINUTES))
                 .sign(algorithmAccess);
     }
 
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(Long id) {
         Algorithm algorithmRefresh = Algorithm.HMAC256(refresh);
         return JWT.create()
                 .withIssuer("refresh")
-                .withClaim("username", username)
+                .withClaim("id", id)
                 .withExpiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
                 .sign(algorithmRefresh);
     }
 
-    /**
-     * Parses the access token and returns the user associated with it.
-     *
-     * @param token The access token to be parsed.
-     * @return The user associated with the access token.
-     * @throws JWTVerificationException if the verification of the access token fails.
-     */
     public User parseAccessToken(String token) throws JWTVerificationException {
         User user = new User();
         Algorithm algorithmAccess = Algorithm.HMAC256(access);
@@ -69,20 +56,15 @@ public class TokenUtil {
         return user;
     }
 
-    /**
-     * Parses the refresh token and returns the username associated with it.
-     *
-     * @param token The refresh token to be parsed.
-     * @return The username associated with the refresh token.
-     */
-    public String parseRefreshToken(String token) {
+    public Long parseRefreshToken(String token) throws JWTVerificationException {
         Algorithm algorithmRefresh = Algorithm.HMAC256(refresh);
 
         JWTVerifier verifier = JWT.require(algorithmRefresh)
                 .withIssuer("refresh")
                 .build();
+
         DecodedJWT decodedJWT = verifier.verify(token);
 
-        return decodedJWT.getClaim("username").as(String.class);
+        return decodedJWT.getClaim("id").as(Long.class);
     }
 }

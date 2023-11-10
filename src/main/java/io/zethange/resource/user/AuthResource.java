@@ -1,10 +1,10 @@
 package io.zethange.resource.user;
 
-import io.zethange.entity.User;
-import io.zethange.models.auth.LoginRequest;
-import io.zethange.models.auth.LoginResponse;
-import io.zethange.models.auth.RefreshRequest;
-import io.zethange.models.auth.RegisterRequest;
+import io.zethange.model.auth.LoginRequest;
+import io.zethange.model.auth.LoginResponse;
+import io.zethange.model.auth.RefreshRequest;
+import io.zethange.model.auth.RegisterRequest;
+import io.zethange.model.user.UserDto;
 import io.zethange.service.auth.AuthService;
 import io.zethange.utils.auth.AccessAuth;
 import jakarta.inject.Inject;
@@ -49,7 +49,7 @@ public class AuthResource {
     @Operation(summary = "Get Me", description = "Get user information")
     @AccessAuth
     @SecurityRequirement(name="JWT")
-    public User getMe() {
+    public UserDto getMe() {
         return authService.getMe();
     }
 }

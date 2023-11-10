@@ -1,4 +1,4 @@
-package io.zethange.models.auth;
+package io.zethange.model.auth;
 
 import lombok.Data;
 
