@@ -1,5 +1,6 @@
 package io.zethange.service.auth;
 
+import io.zethange.configuration.auth.UserContext;
 import io.zethange.entity.User;
 import io.zethange.models.auth.LoginRequest;
 import io.zethange.models.auth.LoginResponse;
@@ -19,6 +20,8 @@ public class AuthService {
     UserService userService;
     @Inject
     TokenUtil token;
+    @Inject
+    UserContext userContext;
 
     /**
      * Authenticates the user with the provided username and password, and returns a LoginResponse.
@@ -69,5 +72,9 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    public User getMe() {
+        return userContext.getCurrentUser();
     }
 }

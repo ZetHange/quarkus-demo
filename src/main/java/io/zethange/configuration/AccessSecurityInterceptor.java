@@ -1,8 +1,8 @@
 package io.zethange.configuration;
 
-import io.zethange.configuration.auth.UserContext;
+import io.zethange.configuration.auth.UserContextImpl;
 import io.zethange.entity.User;
-import io.zethange.service.user.UserService;
+import io.zethange.repository.UserRepository;
 import io.zethange.utils.auth.AccessAuth;
 import io.zethange.utils.auth.TokenUtil;
 import jakarta.annotation.Priority;
@@ -23,9 +23,11 @@ import java.util.Objects;
 @Priority(Priorities.AUTHENTICATION)
 public class AccessSecurityInterceptor implements ContainerRequestFilter {
     @Inject
-    UserService userService;
+    UserRepository userRepository;
     @Inject
     ResourceInfo resourceInfo;
+    @Inject
+    UserContextImpl userContext;
     @Inject
     TokenUtil tokenUtil;
 
@@ -47,18 +49,14 @@ public class AccessSecurityInterceptor implements ContainerRequestFilter {
 
             User user = tokenUtil.parseAccessToken(token);
 
-            user = userService.getByUsername(user.getUsername());
+            user = userRepository.findById(user.id);
 
             if(roles.length != 0 &&!Arrays.asList(roles).contains(user.getRole())) {
                 throw new Exception("role");
             }
 
-            UserContext newContext = new UserContext();
-            newContext.setUser(user);
-
-            context.setSecurityContext(newContext);
+            userContext.setCurrentUser(user);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new NotAuthorizedException("");
         }
     }
