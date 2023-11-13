@@ -1,4 +1,4 @@
-package io.zethange.entity;
+package io.zethange.entity.user;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;

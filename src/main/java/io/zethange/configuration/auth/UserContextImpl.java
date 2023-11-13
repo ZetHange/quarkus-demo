@@ -1,6 +1,6 @@
 package io.zethange.configuration.auth;
 
-import io.zethange.entity.User;
+import io.zethange.entity.user.User;
 import jakarta.enterprise.context.RequestScoped;
 
 @RequestScoped

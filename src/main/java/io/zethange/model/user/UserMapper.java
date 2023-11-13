@@ -1,6 +1,6 @@
 package io.zethange.model.user;
 
-import io.zethange.entity.User;
+import io.zethange.entity.user.User;
 import org.mapstruct.Mapper;
 
 import java.util.List;

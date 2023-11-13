@@ -1,6 +1,6 @@
 package io.zethange.service.user;
 
-import io.zethange.entity.User;
+import io.zethange.entity.user.User;
 import io.zethange.exception.BaseException;
 import io.zethange.model.user.UserDto;
 import io.zethange.model.user.UserMapper;

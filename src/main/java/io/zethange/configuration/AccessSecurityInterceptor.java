@@ -2,7 +2,7 @@ package io.zethange.configuration;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.zethange.configuration.auth.UserContextImpl;
-import io.zethange.entity.User;
+import io.zethange.entity.user.User;
 import io.zethange.exception.BaseException;
 import io.zethange.repository.UserRepository;
 import io.zethange.utils.auth.AccessAuth;

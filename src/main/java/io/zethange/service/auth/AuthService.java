@@ -2,7 +2,7 @@ package io.zethange.service.auth;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.zethange.configuration.auth.UserContext;
-import io.zethange.entity.User;
+import io.zethange.entity.user.User;
 import io.zethange.exception.BaseException;
 import io.zethange.model.auth.LoginRequest;
 import io.zethange.model.auth.LoginResponse;
